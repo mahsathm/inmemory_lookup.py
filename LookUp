@@ -1,0 +1,32 @@
+import sqlite3
+import pandas as pd
+
+
+# Create a new database file:
+db = sqlite3.connect("books.sqlite")
+
+# Load the CSV in chunks:
+for c in pd.read_csv("books.csv", chunksize=1000):
+    # Append all rows to a new database table, which
+    # we name 'books':
+    c.to_sql("books", db, if_exists="append")
+# Add an index on the 'isbn' column:
+db.execute("CREATE INDEX isbn ON books(isbn)") 
+db.close()
+
+
+def get_book_info(isbn):
+  conn = sqlite3.connect("books.sqlite")
+  q = "SELECT * FROM books WHERE isbn = ?"
+  values = (isbn,)
+  return pd.read_sql_query(q, conn, values)
+
+main()
+  isbn = int(input("Please enter the ISBN number:"))
+  strout = get_voters_for_street(isbn)
+  print("Title: {}".format(strout.Title))
+  print("Author: {}".format(strout.Author))
+  print("Language: {}".format(strout.Language))
+
+if __name__ == "__main__":
+    main()
